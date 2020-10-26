@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+import "github.com/metaverse/truss/deftree/googlethirdparty/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message EventLog {
+    // base info
+    string event_id = 1;     // 唯一事件ID
+    int64 event_time = 2;    // 事件发生时间截(ms)
+    int64 logged_time = 3;   // 日志记录时间截(ms)
+    string session_id = 4;   // 会话ID，见文档解释，非业务用户状态的session_id
+    string udid = 5;         // 唯一设备ID
+    string tkid = 6;         // 反作弊生成的唯一ID
+    string mid = 7;          // 用户id
+    string platform = 8;     // 数据来源平台 e.g. h5 / android / ios / server
+    string app_version = 9;  // App版本
+    string app_channel = 10; // App的安装渠道
+    string app_type = 11;    // App名称标识，规则：仅包含字母数字
+    string user_agent = 12;  // 系统自动获取，服务端上报需指定
+    string event = 13;       // 事件类型，规则：仅包含字母数字
+    string env = 14;         // 环境 dev/test/prod, 为空默认为prod
+
+    // device info
+    string os = 20;                // 设备系统 e.g. ios / android
+    string os_version = 21;        // 系统版本 e.g. Android 5.0
+    string device_model = 22;      // 设备型号 e.g. SM-G9308
+    string device_vendor = 23;     // 设备厂商 e.g. samsuang
+    string device_brand = 24;      // 设备品牌 e.g. xiaomi
+    string screen_size = 25;       // 屏幕尺寸 e.g. 5.1
+    int32 screen_width = 26;       // 屏幕宽度 e.g. 1024
+    int32 screen_height = 27;      // 屏幕调试 e.g. 768
+    string screen_resolution = 28; // 屏幕分辨率 e.g. 1024x768
+    string imei = 29;
+    string android_id = 30;
+    string idfa = 31;
+    string oaid = 32;
+
+    // network & ges info
+    enum Carrier {
+        CARRIER_UNKNOWN = 0;
+        CARRIER_CM = 1; // 中国移动
+        CARRIER_CU = 2; // 中国联通
+        CARRIER_CT = 3; // 中国电信
+    }
+    Carrier carrier = 40; // 运营商
+
+    enum Network {
+        NETWORK_UNKNOWN = 0;
+        NETWORK_WIFI = 1;
+        NETWORK_2G = 2;
+        NETWORK_3G =  3;
+        NETWORK_4G = 4;
+        NETWORK_5G = 5;
+    }
+    Network network = 41;
+
+    string ip = 42;          // 系统自动获取, 服务端上报需指定
+    string ip_country = 43;  // 系统根据ip自动解析
+    string ip_province = 44; // 系统根据ip自动解析
+    string ip_city = 45;     // 系统根据ip自动解析
+    string lon = 46;         // GPS 经度 e.g. 120.555311
+    string lat = 47;         // GPS 纬度 e.g. 32.342342
+    string mac = 48;         // mac 地址
+
+
+    // event info
+    string page_id = 80;     // 页面ID e.g. goods_detail
+    string pv_id = 81;       // 页面访问ID，全局唯一标识一次访问事件
+    string layout_id = 82;   // 页面布局ID，同一页面存在不同的布局渲染可通过该值区分
+    string page_key = 83;    // 页面的核心参数 e.g. 10023  (商品ID)
+    string module_id = 84;   // 页面模块ID
+    string action_type = 85; // 触发事件的类型 e.g. click/show/jump/stay/refresh/slide
+
+    // ref event info
+    string ref_page_id = 90;   // 上一个页面的page_id
+    string ref_pv_id = 91;     // 上一个页面的pv_id
+    string ref_layout_id = 92; // 上一个页面的layout_id, 为空可不传
+    string ref_page_key = 93;  // 上一个页面的page_key
+    string ref_module_id = 94; // 点击上个页面的哪个module_id跳转至当前页面
+    string referer = 99;       // 系统自动从HTTP Header中获取
+
+    // event data
+    int32 duration = 100; // 时长，停留事件设置
+    map<string, string> extend_info = 200; // 事件扩展信息
+}
+
+// 事件通用属性
+message EventLogCommon {
+    string udid = 1;
+    string tkid = 2;
+    string mid = 3;
+    string platform = 4;
+    string app_version = 5;
+    string app_channel = 6;
+    string app_type = 7;
+    string env = 8;
+    string os = 10;
+    string os_version = 11;
+    string device_model = 12;
+    string device_vendor = 13;
+    string device_brand = 14;
+    string screen_size = 15;
+    int32 screen_width = 16;
+    int32 screen_height = 17;
+    string screen_resolution = 18;
+    string imei = 19;
+    string android_id = 20;
+    string idfa = 21;
+    string oaid = 22;
+    EventLog.Carrier carrier = 30;
+    EventLog.Network network = 31;
+    string lon = 32;
+    string lat = 33;
+    string mac = 34;
+}
+
+message EventLogs {
+    EventLogCommon common = 1;
+    repeated EventLog events = 2;
+}
+
+message Response {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message Empty {}
+
+service LogService {
+    rpc SubmitSingle(EventLog) returns (Response) {
+        option (google.api.http) = {
+            post: "/s"
+            body: "*"
+        };
+    }
+    rpc SubmitMultiple(EventLogs) returns (Response) {
+        option (google.api.http) = {
+            post: "/mul"
+            body: "*"
+        };
+    }
+    rpc Ping(Empty) returns (Response) {
+        option (google.api.http) = {
+            get: "/ping"
+        };
+    }
+}
