@@ -43,3 +43,22 @@ func main() {
 	server.Run(cfg)
 }
 ```
+
+## Client
+
+Support both gGRPC and HTTP protocol.
+
+HTTP example:
+Post single event, can use json or protobuf data format.
+See interface-defs/event_log.proto `EventLog` for data structure.
+```
+curl -H "Content-Type: application/json" --data-binary @single-event.json http://logserver-host/s
+curl -H "Content-Type: application/protobuf" --data-binary @single-event.pb http://logserver-host/s
+```
+
+Post multiple events, can use json or protobuf data format.
+See interface-defs/event_log.proto `EventLogs` for data structure.
+```
+curl -H "Content-Type: application/json" --data-binary @multiple-events.json http://logserver-host/mul
+curl -H "Content-Type: application/protobuf" --data-binary @multiple-events.pb http://logserver-host/mul
+```
