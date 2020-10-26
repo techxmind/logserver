@@ -1,4 +1,4 @@
-# LogServer
+# LogServer [![Build Status](https://travis-ci.org/techxmind/logserver.svg?branch=main)](https://travis-ci.org/techxmind/logserver)
 
 User behavior event log collection service.
 
