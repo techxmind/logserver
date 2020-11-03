@@ -322,12 +322,17 @@ func (s *standardName) GetValue(e *pb.EventLog) (string, error) {
 	// TPL.EVENT_LOG_GETTER.END
 	case "eventtimestr":
 		if s.key == "" {
-			return time.Unix(int64(e.EventTime/1000), 0).Format("2006-01-02T15:04:05Z"), nil
+			return time.Unix(int64(e.EventTime/1000), 0).Format("2006-01-02T15:04:05"), nil
 		}
 		return "", errFieldNotExists
 	case "loggedtimestr":
 		if s.key == "" {
-			return time.Unix(int64(e.LoggedTime/1000), 0).Format("2006-01-02T15:04:05Z"), nil
+			return time.Unix(int64(e.LoggedTime/1000), 0).Format("2006-01-02T15:04:05"), nil
+		}
+		return "", errFieldNotExists
+	case "loggeddate":
+		if s.key == "" {
+			return time.Unix(int64(e.LoggedTime/1000), 0).Format("20060102"), nil
 		}
 		return "", errFieldNotExists
 	default:
