@@ -9,6 +9,7 @@ my $struct_info = struct_info();
 
 process_file($base_dir . '/eventlog/fill.go');
 process_file($base_dir . '/service/handlers/validate.go');
+process_file($base_dir . '/tool/consumer/getter.go');
 
 sub process_file {
     my ($file) = @_;
@@ -112,6 +113,49 @@ EOT
 			log.$field = common.$field
 		}
 EOT
+        }
+    }
+
+    return join("\n", @content);
+}
+
+sub tpl_event_log_getter {
+    my ($params) = @_;
+
+    my $defs = $struct_info->{EventLog};
+    my $self = 's';
+    if ($params =~ /^\w+/) {
+        $name = $params;
+    }
+
+    my @content = ();
+    for my $field (sort keys %{$defs}) {
+        my $type = $defs->{$field}{type};
+        my $proto_type = $defs->{$field}{proto_type};
+        my $standard_field = lc($field);
+
+        if ($type eq 'string') {
+            push @content, qq/\tcase "$standard_field":/;
+            push @content, qq/\t\tif $self.key == "" {\n\t\t\treturn e.$field, nil\n\t\t}/;
+            push @content, qq/\t\treturn "", errFieldNotExists/;
+        }
+
+        if ($type =~ /^int(\d+)?$/ || $proto_type eq 'varint') {
+            push @content, qq/\tcase "$standard_field":/;
+            push @content, qq/\t\tif $self.key == "" {\n\t\t\treturn strconv.FormatInt(int64(e.$field), 10), nil\n\t\t}/;
+            push @content, qq/\t\treturn "", errFieldNotExists/;
+        }
+
+        if ($type =~ /^map/) {
+            push @content, qq/\tcase "$standard_field":/;
+            push @content, qq/\t\tif $self.key != "" {/;
+            push @content, qq/\t\t\tif e.$field == nil {\n\t\t\t\treturn "", nil\n\t\t\t}/;
+            push @content, qq/\t\t\treturn e.$field\[$self.key\], nil/;
+            push @content, qq/\t\t}/;
+            push @content, qq/\t\tif bs, err := json.Marshal(e.$field); err == nil {/;
+            push @content, qq/\t\t\treturn string(bs), nil/;
+            push @content, qq/\t\t}/;
+            push @content, qq/\t\treturn "", nil/;
         }
     }
 

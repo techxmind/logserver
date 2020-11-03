@@ -1,9 +1,11 @@
 package logger
 
 import (
-	_ "flag"
+	"flag"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -15,6 +17,25 @@ var (
 )
 
 func init() {
+	var (
+		lvl            = zap.InfoLevel
+		levelFlagName  = "log-level"
+		levelFlagUsage = "minimum enabled logging level. debug|info|warn|error|dpanic|panic|fatal"
+	)
+
+	flag.Var(&lvl, levelFlagName, levelFlagUsage)
+
+	logArgs := regexp.MustCompile(`-{1,2}` + levelFlagName + `(?:\s+|\s*=\s*)(\w+)`).
+		FindString(strings.Join(os.Args[1:], " "))
+
+	if logArgs != "" {
+		// use local FlagSet to parse immediately
+		flagSet := flag.NewFlagSet("logger", flag.ContinueOnError)
+		flagSet.Var(&lvl, levelFlagName, levelFlagUsage)
+		flagSet.Parse(regexp.MustCompile(`\s+`).Split(logArgs, 2))
+		_atom.SetLevel(lvl)
+	}
+
 	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = ""
 

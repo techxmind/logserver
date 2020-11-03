@@ -17,6 +17,8 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/techxmind/go-utils v0.0.0-20201025145251-2d5da175c756
 	github.com/techxmind/ip2location v0.0.0-20201016120605-9ca74285b024
+	github.com/techxmind/rollingfile v0.0.0-20201102125758-eaabf7bcf591
+	go.uber.org/atomic v1.7.0
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
 	google.golang.org/grpc v1.26.0

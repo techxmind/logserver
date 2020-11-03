@@ -276,6 +276,8 @@ github.com/techxmind/go-utils v0.0.0-20201025145251-2d5da175c756 h1:Kt9nSxIbN5uB
 github.com/techxmind/go-utils v0.0.0-20201025145251-2d5da175c756/go.mod h1:F8DtfFXxjw9sDArW6D/kbA83e0tjkCayyOSRCPEX+YQ=
 github.com/techxmind/ip2location v0.0.0-20201016120605-9ca74285b024 h1:kj2r55FtGEUQ4ixRefHAwf2aNm7+9gSFk/4zRMeVyEo=
 github.com/techxmind/ip2location v0.0.0-20201016120605-9ca74285b024/go.mod h1:RGFFgdoTk3ygSslSF5fqGfGC+3jlIGyzl/ScewTFoBM=
+github.com/techxmind/rollingfile v0.0.0-20201102125758-eaabf7bcf591 h1:y+llM7HX2usNQZ47F2e34x8++p9Kc7v+zOuskwZK4Sk=
+github.com/techxmind/rollingfile v0.0.0-20201102125758-eaabf7bcf591/go.mod h1:QWz6+diIPRuHP4orPN9OusOf3OQIZ3n+R0BXheGZdbM=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
