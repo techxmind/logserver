@@ -44,4 +44,5 @@ func WrapService(in pb.LogServiceServer) pb.LogServiceServer {
 func WrapDebugService(mu *http.ServeMux) {
 	mu.Handle("/log_level", logger.HttpHandler())
 	mu.Handle("/metrics", metrics.HttpHandler())
+	mu.Handle("/version", _service.config)
 }

@@ -13,9 +13,22 @@ import (
 	"github.com/techxmind/logserver/service/svc/server"
 )
 
+var (
+	// version is compiled into logservice with the flag
+	// go install -ldflags "-X main.version=$VERSION"
+	version string
+
+	// BuildDate is compiled into logservice with the flag
+	// go install -ldflags "-X main.date=$VERSION_DATE"
+	date string
+)
+
 func main() {
 	// Update addresses if they have been overwritten by flags
 	flag.Parse()
+
+	config.DefaultConfig.Version = version
+	config.DefaultConfig.VersionDate = date
 
 	server.Run(config.DefaultConfig)
 }

@@ -11,8 +11,24 @@ import (
 	"github.com/techxmind/logserver/consumer"
 )
 
+var (
+	// version is compiled into logservice with the flag
+	// go install -ldflags "-X main.version=$VERSION"
+	version string
+
+	// BuildDate is compiled into logservice with the flag
+	// go install -ldflags "-X main.date=$VERSION_DATE"
+	date string
+)
+
 func main() {
+	showVersion := flag.Bool("v", false, "show version")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("Version:%s\nDate:%s", version, date)
+		return
+	}
 
 	ctx := context.Background()
 	consumer, err := consumer.New(ctx, consumer.DefaultConfig)
