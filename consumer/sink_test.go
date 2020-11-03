@@ -118,10 +118,10 @@ func TestSink(t *testing.T) {
 		}
 	}
 	// wait for sink processing
-	time.Sleep(time.Microsecond * 10)
+	time.Sleep(time.Microsecond * 50)
 	sink.Close()
 	// wait for the final posiable ack
-	time.Sleep(time.Microsecond * 10)
+	time.Sleep(time.Microsecond * 50)
 	cancel()
 	assert.Equal(t, 5, len(ackedIds))
 	assert.Equal(t, 5, ackCount)
