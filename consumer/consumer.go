@@ -110,6 +110,7 @@ OUTLOOP:
 
 		case err := <-c.sink.Errors():
 			logger.Error("Sink", "err", err)
+			c.Close()
 			break OUTLOOP
 
 		case iack := <-c.sink.Ack():
