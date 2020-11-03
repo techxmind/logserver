@@ -8,7 +8,8 @@ deploy:
   only:
     - main
   script:
-    - make service
+    - make
     - pwd
     - sudo mv -f build/logservice /opt/app/logserver/bin/logservice
+    - sudo mv -f build/logconsumer /opt/app/logserver/bin/logconsumer
     - sudo sv restart logserver
