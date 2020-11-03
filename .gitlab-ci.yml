@@ -1,0 +1,15 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  tags:
+    - shell
+  only:
+    - main
+  script: |
+    - make service
+    - pwd
+    - sudo mv -f build/logservice /opt/app/logserver/bin/logservice
+    - sudo sv restart logserver
+
