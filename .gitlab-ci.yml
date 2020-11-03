@@ -7,9 +7,51 @@ deploy:
     - shell
   only:
     - main
-  script:
-    - make
-    - pwd
-    - sudo mv -f build/logservice /opt/app/logserver/bin/logservice
-    - sudo mv -f build/logconsumer /opt/app/logserver/bin/logconsumer
-    - sudo sv restart logserver
+  script: |
+    #!/bin/bash
+    state_file=/tmp/gitlab-ci-logserver
+
+    if [[ ! -f $state_file ]]; then
+        touch $state_file
+    fi
+
+    last_commit=$(cat $state_file)
+    build_consumer=""
+    build_service="1"
+
+    if [[ -n $last_commit ]]; then
+        consumer_mod_count=$(git diff --raw $last_commit | grep consumer | wc -l | awk '{print $1}')
+        total_mod_count=$(git diff --raw $last_commit | wc -l | awk '{print $1}')
+
+        if [[ $consumer_mod_count != "0" ]]; then
+            build_consumer="1"
+        fi
+
+        if [[ $consumer_mod_count = $total_mod_count ]]; then
+            build_service=""
+        fi
+    fi
+
+    if [[ -n $build_consumer ]] && [[ -n $build_service ]]; then
+        echo "build all"
+        make all
+        sudo mv -f build/logservice /opt/app/logserver/bin/logservice
+        sudo mv -f build/logconsumer /opt/app/logserver/bin/logconsumer
+        sudo sv restart logserver
+        sudo sv restart logconsumer
+    elif [[ -n $build_consumer ]]; then
+        echo "build consumer"
+        make consumer
+        sudo mv -f build/logconsumer /opt/app/logserver/bin/logconsumer
+        sudo sv restart logconsumer
+    elif [[ -n $build_service ]]; then
+        echo "build service"
+        make service
+        sudo mv -f build/logservice /opt/app/logserver/bin/logservice
+        sudo sv restart logserver
+    else
+        echo "Nothing to build"
+    fi
+
+    last_commit=$(git rev-parse HEAD)
+    echo $last_commit > $state_file
