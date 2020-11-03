@@ -80,8 +80,8 @@ func TestGetValue(t *testing.T) {
 		{"extend_info", jsonEncode(e.ExtendInfo)},
 		{"extend_info.foo", e.ExtendInfo["foo"]},
 		{"event_time", strconv.Itoa(int(now.UnixNano() / int64(1e6)))},
-		{"event_time_str", now.Format("2006-01-02T15:04:05Z")},
-		{"logged_time_str", now.Format("2006-01-02T15:04:05Z")},
+		{"event_time_str", now.Format("2006-01-02T15:04:05")},
+		{"logged_time_str", now.Format("2006-01-02T15:04:05")},
 	}
 
 	for _, test := range tests {
