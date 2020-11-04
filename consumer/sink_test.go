@@ -81,7 +81,7 @@ func TestSink(t *testing.T) {
 	cw, err := NewCSVMarshaler([]string{"event_id", "user_agent"})
 	require.Nil(t, err)
 
-	sink := NewSink(sb, cw, WithInputBufferSize(1))
+	sink := NewSink(sb, cw, WithInputBufferSize(0), WithOutputBufferSize(1))
 	ctx, cancel := context.WithCancel(context.Background())
 	ackedIds := make(map[string]int)
 	ackCount := 0
