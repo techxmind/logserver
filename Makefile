@@ -24,12 +24,12 @@ test:
 	@$(GO_BIN) test -timeout=90s ./...
 
 .PHONY: service
-service: clean test
+service: clean
 	@echo "Build logserver"
 	@$(GO_BIN) build -ldflags "$(LDFLAGS)" -o $(SERVICE_DIST) $(SERVICE_SRC)
 
 .PHONY: consumer
-consumer: clean test
+consumer: clean
 	@echo "Build logconsumer"
 	@$(GO_BIN) build -ldflags "$(LDFLAGS)" -o $(CONSUMER_DIST) $(CONSUMER_SRC)
 
