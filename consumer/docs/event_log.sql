@@ -49,6 +49,7 @@ CREATE TABLE event_log (
   ref_module_id varchar(50) not null default '',
   referer varchar(250) not null default '',
   duration int not null default 0,
+  extend_info JSON NULL,
   UNIQUE KEY(event_id),
   KEY(logged_time),
   KEY(logged_date),

@@ -91,4 +91,10 @@ func TestGetValue(t *testing.T) {
 			ast.Equal(test.expect, name.MustGetValue(e), "name="+test.name)
 		}
 	}
+
+	e2 := &pb.EventLog{}
+
+	name, err := newStandardName("extend_info")
+	ast.NoError(err)
+	ast.Equal("{}", name.MustGetValue(e2))
 }

@@ -140,10 +140,13 @@ func (s *standardName) GetValue(e *pb.EventLog) (string, error) {
 			}
 			return e.ExtendInfo[s.key], nil
 		}
+		if e.ExtendInfo == nil {
+				return "{}", nil
+			}
 		if bs, err := json.Marshal(e.ExtendInfo); err == nil {
 			return string(bs), nil
 		}
-		return "", nil
+		return "{}", nil
 	case "idfa":
 		if s.key == "" {
 			return e.Idfa, nil

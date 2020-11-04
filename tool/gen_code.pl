@@ -9,7 +9,7 @@ my $struct_info = struct_info();
 
 process_file($base_dir . '/eventlog/fill.go');
 process_file($base_dir . '/service/handlers/validate.go');
-process_file($base_dir . '/tool/consumer/getter.go');
+process_file($base_dir . '/consumer/getter.go');
 
 sub process_file {
     my ($file) = @_;
@@ -152,10 +152,11 @@ sub tpl_event_log_getter {
             push @content, qq/\t\t\tif e.$field == nil {\n\t\t\t\treturn "", nil\n\t\t\t}/;
             push @content, qq/\t\t\treturn e.$field\[$self.key\], nil/;
             push @content, qq/\t\t}/;
+            push @content, qq/\t\tif e.$field == nil {\n\t\t\t\treturn "{}", nil\n\t\t\t}/;
             push @content, qq/\t\tif bs, err := json.Marshal(e.$field); err == nil {/;
             push @content, qq/\t\t\treturn string(bs), nil/;
             push @content, qq/\t\t}/;
-            push @content, qq/\t\treturn "", nil/;
+            push @content, qq/\t\treturn "{}", nil/;
         }
     }
 
