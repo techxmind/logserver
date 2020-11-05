@@ -1,57 +1,56 @@
 stages:
-  - deploy
+  - build
+  - deploy-test
+  - deploy-prod
 
-deploy:
-  stage: deploy
+variables:
+  ARTIFACT_DIR: "/opt/artifacts"
+  DEPLOY_SERVICE: "/opt/deploy/deploy"
+  GROUP: "logserver"
+  SERVICE: "logservice"
+  CONSUMER: "logconsumer"
+  KEEP_VERSIONS: 5
+
+default:
+  before_script:
+    - VERSION=$(git rev-parse --short HEAD)
+
+unit-test:
+  stage: .pre
   tags:
-    - shell
+    - unit
+  script:
+    - make test
+
+build:
+  stage: build
+  tags:
+    - txm-build
   only:
     - main
-  script: |
-    #!/bin/bash
-    state_file=/tmp/gitlab-ci-logserver
+    - test
+  script:
+    - if [ ! -d $ARTIFACT_DIR ]; then mkdir -p $ARTIFACT_DIR; fi;
+    - make
+    - mv -f build/$SERVICE $ARTIFACT_DIR/$SERVICE.v_$VERSION
+    - mv -f build/$CONSUMER $ARTIFACT_DIR/$CONSUMER.v_$VERSION
 
-    if [[ ! -f $state_file ]]; then
-        touch $state_file
-    fi
+deploy-test:
+  stage: deploy-test
+  tags:
+    - txm-build
+  only:
+    - test
+  script:
+    - sudo $DEPLOY_SERVICE -r -e test -g $GROUP -s $SERVICE -v $VERSION -a $ARTIFACT_DIR/$SERVICE.v_$VERSION -k $KEEP_VERSIONS
+    - sudo $DEPLOY_SERVICE -r -e test -g $GROUP -s $CONSUMER -v $VERSION -a $ARTIFACT_DIR/$CONSUMER.v_$VERSION -k $KEEP_VERSIONS
 
-    last_commit=$(cat $state_file)
-    build_consumer=""
-    build_service="1"
-
-    if [[ -n $last_commit ]]; then
-        consumer_mod_count=$(git diff --raw $last_commit | grep consumer | wc -l | awk '{print $1}')
-        total_mod_count=$(git diff --raw $last_commit | wc -l | awk '{print $1}')
-
-        if [[ $consumer_mod_count != "0" ]]; then
-            build_consumer="1"
-        fi
-
-        if [[ $consumer_mod_count = $total_mod_count ]]; then
-            build_service=""
-        fi
-    fi
-
-    if [[ -n $build_consumer ]] && [[ -n $build_service ]]; then
-        echo "build all"
-        make all
-        sudo mv -f build/logservice /opt/app/logserver/bin/logservice
-        sudo mv -f build/logconsumer /opt/app/logserver/bin/logconsumer
-        sudo sv restart logserver
-        sudo sv restart logconsumer
-    elif [[ -n $build_consumer ]]; then
-        echo "build consumer"
-        make consumer
-        sudo mv -f build/logconsumer /opt/app/logserver/bin/logconsumer
-        sudo sv restart logconsumer
-    elif [[ -n $build_service ]]; then
-        echo "build service"
-        make service
-        sudo mv -f build/logservice /opt/app/logserver/bin/logservice
-        sudo sv restart logserver
-    else
-        echo "Nothing to build"
-    fi
-
-    last_commit=$(git rev-parse HEAD)
-    echo $last_commit > $state_file
+deploy-prod:
+  stage: deploy-prod
+  tags:
+    - txm-build
+  only:
+    - main
+  script:
+    - sudo $DEPLOY_SERVICE -r -e prod -g $GROUP -s $SERVICE -v $VERSION -a $ARTIFACT_DIR/$SERVICE.v_$VERSION -k $KEEP_VERSIONS
+    - sudo $DEPLOY_SERVICE -e prod -g $GROUP -s $CONSUMER -v $VERSION -a $ARTIFACT_DIR/$CONSUMER.v_$VERSION -k $KEEP_VERSIONS
