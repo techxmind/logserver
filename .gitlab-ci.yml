@@ -15,7 +15,7 @@ default:
   before_script:
     - if [ ! -d $ARTIFACT_DIR ]; then mkdir -p $ARTIFACT_DIR; fi;
     - VERSION=$(git rev-parse --short HEAD)
-    - VERSION_DATE=$($(MAKEFILE_PATH)/commit_date.sh '%m%d%H%M')
+    - VERSION_DATE=$(./commit_date.sh '%m%d%H%M')
     - SERVICE_OUTPUT=$ARTIFACT_DIR/$SERVICE.$VERSION_DATE.v_$VERSION
     - CONSUMER_OUTPUT=$ARTIFACT_DIR/$CONSUMER.$VERSION_DATE.v_$VERSION
 
