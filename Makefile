@@ -1,7 +1,8 @@
+MAKEFILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 GO_BIN ?= go
 SHELL := /bin/bash
 VERSION ?= v_$(shell git rev-parse --short HEAD)
-VERSION_DATE ?= $(shell date +"%Y-%m-%dT%H:%M:%SZ")
+VERSION_DATE := $(shell $(MAKEFILE_PATH)/commit_date.sh)
 
 PWD=$(shell pwd)
 OUT_DIR=$(PWD)/build

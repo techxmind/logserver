@@ -13,7 +13,11 @@ variables:
 
 default:
   before_script:
+    - if [ ! -d $ARTIFACT_DIR ]; then mkdir -p $ARTIFACT_DIR; fi;
     - VERSION=$(git rev-parse --short HEAD)
+    - VERSION_DATE=$(shell $(MAKEFILE_PATH)/commit_date.sh)
+    - SERVICE_OUTPUT=$ARTIFACT_DIR/$SERVICE.$VERSION_DATE.v_$VERSION
+    - CONSUMER_OUTPUT=$ARTIFACT_DIR/$CONSUMER.$VERSION_DATE.v_$VERSION
 
 unit-test:
   stage: .pre
@@ -30,10 +34,9 @@ build:
     - main
     - test
   script:
-    - if [ ! -d $ARTIFACT_DIR ]; then mkdir -p $ARTIFACT_DIR; fi;
     - make
-    - mv -f build/$SERVICE $ARTIFACT_DIR/$SERVICE.v_$VERSION
-    - mv -f build/$CONSUMER $ARTIFACT_DIR/$CONSUMER.v_$VERSION
+    - mv -f build/$SERVICE $SERVICE_OUTPUT
+    - mv -f build/$CONSUMER $CONSUMER_OUTPUT
 
 deploy-test:
   stage: deploy-test
@@ -42,8 +45,8 @@ deploy-test:
   only:
     - test
   script:
-    - sudo $DEPLOY_SERVICE -r -e test -g $GROUP -s $SERVICE -v $VERSION -a $ARTIFACT_DIR/$SERVICE.v_$VERSION -k $KEEP_VERSIONS
-    - sudo $DEPLOY_SERVICE -r -e test -g $GROUP -s $CONSUMER -v $VERSION -a $ARTIFACT_DIR/$CONSUMER.v_$VERSION -k $KEEP_VERSIONS
+    - sudo $DEPLOY_SERVICE -r -e test -g $GROUP -s $SERVICE -v $VERSION -a $SERVICE_OUTPUT -k $KEEP_VERSIONS
+    - sudo $DEPLOY_SERVICE -r -e test -g $GROUP -s $CONSUMER -v $VERSION -a $CONSUMER_OUTPUT -k $KEEP_VERSIONS
 
 deploy-prod:
   stage: deploy-prod
@@ -52,5 +55,5 @@ deploy-prod:
   only:
     - main
   script:
-    - sudo $DEPLOY_SERVICE -r -e prod -g $GROUP -s $SERVICE -v $VERSION -a $ARTIFACT_DIR/$SERVICE.v_$VERSION -k $KEEP_VERSIONS
-    - sudo $DEPLOY_SERVICE -e prod -g $GROUP -s $CONSUMER -v $VERSION -a $ARTIFACT_DIR/$CONSUMER.v_$VERSION -k $KEEP_VERSIONS
+    - sudo $DEPLOY_SERVICE -r -e prod -g $GROUP -s $SERVICE -v $VERSION -a $SERVICE_OUTPUT -k $KEEP_VERSIONS
+    - sudo $DEPLOY_SERVICE -e prod -g $GROUP -s $CONSUMER -v $VERSION -a $CONSUMER_OUTPUT -k $KEEP_VERSIONS
