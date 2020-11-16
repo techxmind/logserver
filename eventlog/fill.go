@@ -2,6 +2,7 @@ package eventlog
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/techxmind/ip2location"
@@ -147,6 +148,9 @@ func Fill(ctx context.Context, common *pb.EventLogCommon, logs []*pb.EventLog) {
 
 		// TPL.EVENT_LOG_FILL.END
 
+		if log.ScreenResolution == "" && log.ScreenWidth > 0 {
+			log.ScreenResolution = fmt.Sprintf("%dx%d", log.ScreenWidth, log.ScreenHeight)
+		}
 	}
 }
 
