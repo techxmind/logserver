@@ -31,6 +31,7 @@ import (
 
 	// This service
 	pb "github.com/techxmind/logserver/interface-defs"
+	"github.com/techxmind/logserver/logger"
 	"github.com/techxmind/logserver/metrics"
 )
 
@@ -111,6 +112,8 @@ func errorEncoder(_ context.Context, err error, w http.ResponseWriter) {
 	}
 	w.WriteHeader(code)
 	w.Write(body)
+
+	logger.Error("request err", "err", err)
 }
 
 type ErrorCoder interface {
@@ -165,7 +168,7 @@ func DecodeHTTPSubmitSingleZeroRequest(_ context.Context, r *http.Request) (inte
 				AllowUnknownFields: true,
 			}
 			if err = unmarshaller.Unmarshal(bytes.NewBuffer(buf), &req); err != nil {
-				const size = 1024
+				const size = 2048
 				if len(buf) > size {
 					buf = buf[:size]
 				}
@@ -212,7 +215,7 @@ func DecodeHTTPSubmitMultipleZeroRequest(_ context.Context, r *http.Request) (in
 				AllowUnknownFields: true,
 			}
 			if err = unmarshaller.Unmarshal(bytes.NewBuffer(buf), &req); err != nil {
-				const size = 8196
+				const size = 2048
 				if len(buf) > size {
 					buf = buf[:size]
 				}
