@@ -80,7 +80,7 @@ message EventLog {
     string referer = 99;       // 系统自动从HTTP Header中获取
 
     // event data
-    int32 duration = 100; // 时长，停留事件设置
+    int64 duration = 100; // 时长，停留事件设置
     map<string, string> extend_info = 200; // 事件扩展信息
 }
 
