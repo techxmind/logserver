@@ -131,6 +131,10 @@ func HttpHandler() http.Handler {
 		promhttp.HandlerFor(stdprometheus.DefaultGatherer, promhttp.HandlerOpts{}))
 }
 
+func AddBadRequest(method string, code int32) {
+	AddRequest(method, code, time.Duration(0))
+}
+
 func AddRequest(method string, code int32, du time.Duration) {
 	codeStr := strconv.Itoa(int(code))
 

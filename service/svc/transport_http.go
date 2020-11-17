@@ -31,6 +31,7 @@ import (
 
 	// This service
 	pb "github.com/techxmind/logserver/interface-defs"
+	"github.com/techxmind/logserver/metrics"
 )
 
 const contentType = "application/json; charset=utf-8"
@@ -152,6 +153,7 @@ func DecodeHTTPSubmitSingleZeroRequest(_ context.Context, r *http.Request) (inte
 	if len(buf) > 0 {
 		if c := r.Header.Get("Content-Type"); strings.Contains(c, "protobuf") {
 			if err = (&req).XXX_Unmarshal(buf); err != nil {
+				metrics.AddBadRequest("s:protobuf", int32(http.StatusBadRequest))
 				return nil, httpError{errors.Wrap(err, "request body : cannot parse protobuf request body"),
 					http.StatusBadRequest,
 					nil,
@@ -163,10 +165,11 @@ func DecodeHTTPSubmitSingleZeroRequest(_ context.Context, r *http.Request) (inte
 				AllowUnknownFields: true,
 			}
 			if err = unmarshaller.Unmarshal(bytes.NewBuffer(buf), &req); err != nil {
-				const size = 8196
+				const size = 1024
 				if len(buf) > size {
 					buf = buf[:size]
 				}
+				metrics.AddBadRequest("s:json", int32(http.StatusBadRequest))
 				return nil, httpError{errors.Wrapf(err, "request body '%s': cannot parse non-json request body", buf),
 					http.StatusBadRequest,
 					nil,
@@ -197,6 +200,7 @@ func DecodeHTTPSubmitMultipleZeroRequest(_ context.Context, r *http.Request) (in
 	if len(buf) > 0 {
 		if c := r.Header.Get("Content-Type"); strings.Contains(c, "protobuf") {
 			if err = (&req).XXX_Unmarshal(buf); err != nil {
+				metrics.AddBadRequest("mul:protobuf", int32(http.StatusBadRequest))
 				return nil, httpError{errors.Wrap(err, "request body : cannot parse protobuf request body"),
 					http.StatusBadRequest,
 					nil,
@@ -212,6 +216,7 @@ func DecodeHTTPSubmitMultipleZeroRequest(_ context.Context, r *http.Request) (in
 				if len(buf) > size {
 					buf = buf[:size]
 				}
+				metrics.AddBadRequest("mul:json", int32(http.StatusBadRequest))
 				return nil, httpError{errors.Wrapf(err, "request body '%s': cannot parse non-json request body", buf),
 					http.StatusBadRequest,
 					nil,
