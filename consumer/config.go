@@ -44,6 +44,12 @@ func init() {
 		"Topics to consume, multiple values are comma separated",
 	)
 	flag.StringVar(
+		&DefaultConfig.Offset,
+		"offset",
+		"newest",
+		"initial offset: newest | oldest",
+	)
+	flag.StringVar(
 		&DefaultConfig.Sink.Marshaler,
 		"sink.marshaler",
 		"json",
@@ -86,6 +92,7 @@ type Config struct {
 	KafkaVersion string      `json:"kafka_version"`
 	Addrs        string      `json:"addrs"`
 	Topics       string      `json:"topics"`
+	Offset       string      `json:"offset"`
 	Sink         *SinkConfig `json:"sink"`
 }
 

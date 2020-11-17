@@ -66,6 +66,10 @@ func New(pctx context.Context, cfg *Config) (*Consumer, error) {
 	consumerConfig.Version = cfg.GetKafkaVersion()
 	consumerConfig.Consumer.Return.Errors = true
 
+	if cfg.Offset == "oldest" {
+		consumerConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
+	}
+
 	group, err := sarama.NewConsumerGroup(addrs, cfg.GroupID, consumerConfig)
 	if err != nil {
 		logger.Fatal("NewConsumerGroup", "err", err)
