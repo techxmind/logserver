@@ -3,6 +3,7 @@ package eventlog
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/techxmind/ip2location"
@@ -32,6 +33,11 @@ func Fill(ctx context.Context, common *pb.EventLogCommon, logs []*pb.EventLog) {
 		}
 	}
 
+	// strip base64 tail padding(=)
+	if common != nil && common.Udid != "" && strings.HasSuffix(common.Udid, "=") {
+		common.Udid = strings.TrimRight(common.Udid, "=")
+	}
+
 	for _, log := range logs {
 		log.LoggedTime = loggedTime
 		log.UserAgent = ua
@@ -40,6 +46,11 @@ func Fill(ctx context.Context, common *pb.EventLogCommon, logs []*pb.EventLog) {
 		log.IpProvince = ipProvince
 		log.IpCity = ipCity
 		log.Referer = referer
+
+		// strip base64 tail padding(=)
+		if log.Udid != "" && strings.HasSuffix(log.Udid, "=") {
+			log.Udid = strings.TrimRight(log.Udid, "=")
+		}
 
 		// TPL.EVENT_LOG_FILL.START
 		if log.AndroidId == "" && common != nil && common.AndroidId != "" {
